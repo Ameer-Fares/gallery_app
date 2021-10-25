@@ -6,10 +6,15 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
+import com.google.gson.JsonIOException;
+import com.google.gson.internal.LinkedTreeMap;
 import com.x.imagegallerychallenge.models.Picture;
 
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -23,13 +28,17 @@ public class GalleryRepository {
         GalleryDatabase database = GalleryDatabase.getInstance(application);
         galleryDao = database.galleryDao();
         retrofit = new Retrofit.Builder()
-                .baseUrl("https://ireadkashkoul.com/wp-json/wp/v2/")
+                .baseUrl("https://api.imgflip.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         galleryApi = retrofit.create(GalleryApi.class);
 
         allPictures = galleryDao.getAllPicture();
+    }
+
+    public LiveData<List<Picture>> getAllPictures() {
+        return galleryDao.getAllPicture();
     }
 
     public void insertPicture(Picture picture) {
@@ -42,6 +51,45 @@ public class GalleryRepository {
 
     public void deleteAllPosts() {
         new ManagePicturesAsync().deleteAllPosts(galleryDao);
+    }
+
+    public void fetchOnlinePictures(OnFetchPicturesListener onFetchPicturesListener) {
+        Call<LinkedTreeMap<String, Object>> call = galleryApi.getPictures();
+        call.enqueue(new Callback<LinkedTreeMap<String, Object>>() {
+            @Override
+            public void onResponse(Call<LinkedTreeMap<String, Object>> call, Response<LinkedTreeMap<String, Object>> response) {
+                if (!response.isSuccessful()) {
+                    Log.d("error", response.message());
+                    onFetchPicturesListener.failed(null);
+                    return;
+                }
+                try {
+                    LinkedTreeMap<String, Object> responseBody = response.body();
+                    boolean responseStatus = (boolean) responseBody.get("success");
+
+                    if (!responseStatus) {
+                        onFetchPicturesListener.failed(null);
+                        return;
+                    }
+                    LinkedTreeMap<String, Object> memesData = (LinkedTreeMap<String, Object>) responseBody.get("data");
+
+
+
+//                    Log.d("categories count", String.valueOf(pictureObjects.size()));
+
+                } catch (Exception e) {
+                    onFetchPicturesListener.failed(null);
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<LinkedTreeMap<String, Object>> call, Throwable t) {
+                Log.d("error", t.getMessage());
+                onFetchPicturesListener.failed(null);
+            }
+        });
     }
 
 

@@ -9,6 +9,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface GalleryApi {
-    @GET("posts")
-    Call<List<LinkedTreeMap<String, Object>>> getPictures();
+    @GET("get_memes")
+    Call<LinkedTreeMap<String, Object>> getPictures();
 }
