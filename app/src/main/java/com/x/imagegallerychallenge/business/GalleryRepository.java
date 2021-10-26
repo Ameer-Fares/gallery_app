@@ -10,6 +10,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.internal.LinkedTreeMap;
 import com.x.imagegallerychallenge.models.Picture;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -71,11 +72,21 @@ public class GalleryRepository {
                         onFetchPicturesListener.failed(null);
                         return;
                     }
-                    LinkedTreeMap<String, Object> memesData = (LinkedTreeMap<String, Object>) responseBody.get("data");
+                    LinkedTreeMap<String, Object> data = (LinkedTreeMap<String, Object>) responseBody.get("data");
+                    List<Object> picturesObjects = (List<Object>) data.get("memes");
+                    List<Picture> pictureList = new ArrayList<>();
+                    for (Object pictureObject : picturesObjects) {
+                        pictureList.add(Picture.map(pictureObject));
+                    }
 
+                    for (Picture picture :
+                            pictureList) {
+                        insertPicture(picture);
+                    }
 
+                    onFetchPicturesListener.requestSucceeded(pictureList);
 
-//                    Log.d("categories count", String.valueOf(pictureObjects.size()));
+                    Log.d("Memes count", String.valueOf(pictureList.size()));
 
                 } catch (Exception e) {
                     onFetchPicturesListener.failed(null);

@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
 import com.x.imagegallerychallenge.R;
 import com.x.imagegallerychallenge.models.Picture;
 
@@ -54,8 +56,8 @@ public class GalleryAdapter extends ListAdapter<Picture, GalleryAdapter.GalleryH
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull GalleryHolder holder, int position) {
-        Picture picture = getItem(position);
 
+        Glide.with(context).load(getItem(position).getUrl()).downsample(DownsampleStrategy.AT_MOST).into(holder.itemImageView);
 
     }
 
