@@ -1,30 +1,26 @@
 package com.x.imagegallerychallenge.adapters;
 
-import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
 import com.x.imagegallerychallenge.R;
 import com.x.imagegallerychallenge.models.Picture;
+import com.x.imagegallerychallenge.ui.gallery.GalleryViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
 public class GalleryAdapter extends ListAdapter<Picture, GalleryAdapter.GalleryHolder> {
     private AppCompatActivity context;
-
+    private GalleryViewModel galleryViewModel;
 
     public GalleryAdapter() {
         super(DIFF_CALLBACK);
@@ -56,9 +52,8 @@ public class GalleryAdapter extends ListAdapter<Picture, GalleryAdapter.GalleryH
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull GalleryHolder holder, int position) {
-
-        Glide.with(context).load(getItem(position).getUrl()).downsample(DownsampleStrategy.AT_MOST).into(holder.itemImageView);
-
+        if (getItem(position).getImage() != null)
+            holder.itemImageView.setImageBitmap(BitmapFactory.decodeByteArray(getItem(position).getImage(), 0, getItem(position).getImage().length));
     }
 
     class GalleryHolder extends RecyclerView.ViewHolder {
@@ -80,5 +75,7 @@ public class GalleryAdapter extends ListAdapter<Picture, GalleryAdapter.GalleryH
         }
     }
 
-
+    public void setGalleryViewModel(GalleryViewModel galleryViewModel) {
+        this.galleryViewModel = galleryViewModel;
+    }
 }

@@ -10,9 +10,13 @@ import com.google.gson.JsonIOException;
 import com.google.gson.internal.LinkedTreeMap;
 import com.x.imagegallerychallenge.models.Picture;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,15 +47,15 @@ public class GalleryRepository {
     }
 
     public void insertPicture(Picture picture) {
-        new ManagePicturesAsync().insertPost(galleryDao, picture);
+        new ManagePicturesAsync().insertPicture(galleryDao, picture);
     }
 
-    public void updatePost(Picture picture) {
-        new ManagePicturesAsync().updatePost(galleryDao, picture);
+    public void updatePicture(Picture picture) {
+        new ManagePicturesAsync().updatePicture(galleryDao, picture);
     }
 
-    public void deleteAllPosts() {
-        new ManagePicturesAsync().deleteAllPosts(galleryDao);
+    public void deleteAllPicture() {
+        new ManagePicturesAsync().deleteAllPicture(galleryDao);
     }
 
     public void fetchOnlinePictures(OnFetchPicturesListener onFetchPicturesListener) {
@@ -75,14 +79,15 @@ public class GalleryRepository {
                     LinkedTreeMap<String, Object> data = (LinkedTreeMap<String, Object>) responseBody.get("data");
                     List<Object> picturesObjects = (List<Object>) data.get("memes");
                     List<Picture> pictureList = new ArrayList<>();
+
                     for (Object pictureObject : picturesObjects) {
-                        pictureList.add(Picture.map(pictureObject));
+                        Picture picture = Picture.map(pictureObject);
+                        pictureList.add(picture);
+                        insertPicture(picture);
+                        if (picture != null)
+                            fetchImageData(picture);
                     }
 
-                    for (Picture picture :
-                            pictureList) {
-                        insertPicture(picture);
-                    }
 
                     onFetchPicturesListener.requestSucceeded(pictureList);
 
@@ -91,8 +96,6 @@ public class GalleryRepository {
                 } catch (Exception e) {
                     onFetchPicturesListener.failed(null);
                 }
-
-
             }
 
             @Override
@@ -103,9 +106,42 @@ public class GalleryRepository {
         });
     }
 
+    public void fetchImageData(Picture picture) {
+        Call<ResponseBody> call = galleryApi.getImageData(picture.getUrl());
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (!response.isSuccessful()) {
+                    Log.d("error", response.message());
+                    return;
+                }
+                try {
+                    InputStream inputStream = response.body().byteStream();
+                    picture.setImage(getBytesFromInputStream(inputStream));
+                    updatePicture(picture);
+                } catch (Exception e) {
+                    Log.v("fetch image error", e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d("error", t.getMessage());
+            }
+        });
+    }
+
+    public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        byte[] buffer = new byte[0xFFFF];
+        for (int len = is.read(buffer); len != -1; len = is.read(buffer)) {
+            os.write(buffer, 0, len);
+        }
+        return os.toByteArray();
+    }
 
     private static class ManagePicturesAsync {
-        private void insertPost(GalleryDao galleryDao, Picture picture) {
+        private void insertPicture(GalleryDao galleryDao, Picture picture) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -118,7 +154,7 @@ public class GalleryRepository {
             }).start();
         }
 
-        private void updatePost(GalleryDao galleryDao, Picture picture) {
+        private void updatePicture(GalleryDao galleryDao, Picture picture) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -127,7 +163,7 @@ public class GalleryRepository {
             }).start();
         }
 
-        private void deletePost(GalleryDao galleryDao, Picture picture) {
+        private void deletePicture(GalleryDao galleryDao, Picture picture) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -136,7 +172,7 @@ public class GalleryRepository {
             }).start();
         }
 
-        private void deleteAllPosts(GalleryDao galleryDao) {
+        private void deleteAllPicture(GalleryDao galleryDao) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {

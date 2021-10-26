@@ -36,6 +36,7 @@ public class GalleryFragment extends Fragment {
         galleryViewModel = new ViewModelProvider(this).get(GalleryViewModel.class);
         RecyclerView galleryRecyclerview = binding.galleryRecyclerview;
         galleryAdapter = new GalleryAdapter();
+        galleryAdapter.setGalleryViewModel(galleryViewModel);
         galleryRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
         galleryRecyclerview.setHasFixedSize(false);
         galleryRecyclerview.setAdapter(galleryAdapter);
@@ -51,6 +52,7 @@ public class GalleryFragment extends Fragment {
             public void onChanged(List<Picture> pictures) {
                 galleryAdapter.submitList(pictures);
                 galleryAdapter.notifyDataSetChanged();
+                galleryViewModel.getAllPictures().removeObservers(getViewLifecycleOwner());
             }
         });
         OnFetchPicturesListener onFetchPicturesListener = createPicturesListener();

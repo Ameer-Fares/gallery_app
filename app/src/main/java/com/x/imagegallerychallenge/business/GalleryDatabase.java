@@ -24,5 +24,4 @@ public abstract class  GalleryDatabase extends RoomDatabase {
         }
         return instance;
     }
-
 }

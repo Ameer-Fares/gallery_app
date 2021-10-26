@@ -30,4 +30,12 @@ public class GalleryViewModel extends AndroidViewModel {
     public void fetchOnlinePictures(OnFetchPicturesListener onFetchPicturesListener) {
         galleryRepository.fetchOnlinePictures(onFetchPicturesListener);
     }
+
+    public void fetchImageData(Picture picture){
+        galleryRepository.fetchImageData(picture);
+    }
+
+    public void updateImageInfo(Picture picture){
+        galleryRepository.updatePicture(picture);
+    }
 }
