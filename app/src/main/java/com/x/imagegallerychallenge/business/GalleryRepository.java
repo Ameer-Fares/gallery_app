@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import com.google.gson.JsonIOException;
 import com.google.gson.internal.LinkedTreeMap;
 import com.x.imagegallerychallenge.models.Picture;
+import com.x.imagegallerychallenge.models.User;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,12 +47,20 @@ public class GalleryRepository {
         return galleryDao.getAllPicture();
     }
 
+    public LiveData<User> getUsers(User user) {
+        return galleryDao.getUsers(user.getUsername());
+    }
+
     public void insertPicture(Picture picture) {
         new ManagePicturesAsync().insertPicture(galleryDao, picture);
     }
 
     public void updatePicture(Picture picture) {
         new ManagePicturesAsync().updatePicture(galleryDao, picture);
+    }
+
+    public void insertUser(User user, OnSignupListener listener) {
+        new ManageUsersAsync().insertUser(galleryDao, user, listener);
     }
 
     public void deleteAllPicture() {
@@ -131,7 +140,22 @@ public class GalleryRepository {
         });
     }
 
-
+    private static class ManageUsersAsync {
+        private void insertUser(GalleryDao galleryDao, User user, OnSignupListener listener) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        galleryDao.insertUser(user);
+                        listener.requestSucceeded(0);
+                    } catch (SQLiteConstraintException e) {
+                        Log.d("error", e.getMessage());
+                        listener.failed(null);
+                    }
+                }
+            }).start();
+        }
+    }
 
     private static class ManagePicturesAsync {
         private void insertPicture(GalleryDao galleryDao, Picture picture) {

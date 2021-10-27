@@ -36,6 +36,10 @@ public interface GalleryDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     void insertUser(User user);
 
+
+    @Query("SELECT * FROM users_table WHERE username = :username")
+    LiveData<User> getUsers(String username);
+
     @Update
     void updateUser(User user);
 
