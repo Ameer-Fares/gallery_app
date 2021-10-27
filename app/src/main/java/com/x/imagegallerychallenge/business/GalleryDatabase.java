@@ -7,9 +7,10 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 import com.x.imagegallerychallenge.models.Picture;
+import com.x.imagegallerychallenge.models.User;
 
-@Database(entities = {Picture.class}, version = 1)
-public abstract class  GalleryDatabase extends RoomDatabase {
+@Database(entities = {Picture.class, User.class}, version = 1)
+public abstract class GalleryDatabase extends RoomDatabase {
 
     private static GalleryDatabase instance;
 

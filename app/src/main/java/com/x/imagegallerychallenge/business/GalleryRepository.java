@@ -117,7 +117,7 @@ public class GalleryRepository {
                 }
                 try {
                     InputStream inputStream = response.body().byteStream();
-                    picture.setImage(getBytesFromInputStream(inputStream));
+                    picture.setImage(HelperMethods.getBytesFromInputStream(inputStream));
                     updatePicture(picture);
                 } catch (Exception e) {
                     Log.v("fetch image error", e.getMessage());
@@ -131,14 +131,7 @@ public class GalleryRepository {
         });
     }
 
-    public static byte[] getBytesFromInputStream(InputStream is) throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        byte[] buffer = new byte[0xFFFF];
-        for (int len = is.read(buffer); len != -1; len = is.read(buffer)) {
-            os.write(buffer, 0, len);
-        }
-        return os.toByteArray();
-    }
+
 
     private static class ManagePicturesAsync {
         private void insertPicture(GalleryDao galleryDao, Picture picture) {

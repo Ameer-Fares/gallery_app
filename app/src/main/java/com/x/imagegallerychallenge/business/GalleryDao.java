@@ -9,6 +9,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.x.imagegallerychallenge.models.Picture;
+import com.x.imagegallerychallenge.models.User;
 
 import java.util.List;
 
@@ -29,5 +30,20 @@ public interface GalleryDao {
 
     @Query("SELECT * FROM pictures_table ORDER BY id DESC")
     LiveData<List<Picture>> getAllPicture();
+    //endregion
+
+    // region User APIs
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    void insertUser(User user);
+
+    @Update
+    void updateUser(User user);
+
+    @Delete
+    void deleteUser(User user);
+
+
+    @Query("SELECT * FROM users_table WHERE username LIKE :username")
+    LiveData<List<User>> getUserbyUsername(String username);
     //endregion
 }
