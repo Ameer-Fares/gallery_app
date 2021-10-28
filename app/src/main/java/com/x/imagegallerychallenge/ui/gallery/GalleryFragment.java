@@ -18,6 +18,7 @@ import com.x.imagegallerychallenge.adapters.GalleryAdapter;
 import com.x.imagegallerychallenge.business.OnFetchPicturesListener;
 import com.x.imagegallerychallenge.databinding.FragmentGalleryBinding;
 import com.x.imagegallerychallenge.models.Picture;
+import com.x.imagegallerychallenge.ui.imageview.ImageFragment;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,14 @@ public class GalleryFragment extends Fragment {
         galleryRecyclerview.setHasFixedSize(false);
         galleryRecyclerview.setAdapter(galleryAdapter);
 
+        galleryAdapter.setOnItemClickListener(new GalleryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Picture picture) {
+                ImageFragment imageFragment = new ImageFragment(picture);
+                imageFragment.show(getChildFragmentManager(), "ImageFragment");
+            }
+        });
+
         return binding.getRoot();
     }
 
@@ -57,15 +66,6 @@ public class GalleryFragment extends Fragment {
         });
         OnFetchPicturesListener onFetchPicturesListener = createPicturesListener();
         galleryViewModel.fetchOnlinePictures(onFetchPicturesListener);
-
-
-//        binding.buttonFirst.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                NavHostFragment.findNavController(GalleryFragment.this)
-//                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
-//            }
-//        });
     }
 
     private OnFetchPicturesListener createPicturesListener() {

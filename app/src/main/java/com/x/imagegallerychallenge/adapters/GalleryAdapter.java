@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 public class GalleryAdapter extends ListAdapter<Picture, GalleryAdapter.GalleryHolder> {
     private AppCompatActivity context;
     private GalleryViewModel galleryViewModel;
+    private GalleryAdapter.OnItemClickListener listener;
 
     public GalleryAdapter() {
         super(DIFF_CALLBACK);
@@ -67,12 +68,21 @@ public class GalleryAdapter extends ListAdapter<Picture, GalleryAdapter.GalleryH
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
-//                    if (listener != null && position != RecyclerView.NO_POSITION) {
-//                        listener.onItemClick(getItem(position));
-//                    }
+                    if (listener != null && position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(getItem(position));
+                    }
                 }
             });
         }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Picture picture);
+    }
+
+
+    public void setOnItemClickListener(GalleryAdapter.OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     public void setGalleryViewModel(GalleryViewModel galleryViewModel) {

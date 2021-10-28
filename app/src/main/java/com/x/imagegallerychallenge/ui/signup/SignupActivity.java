@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -62,7 +63,7 @@ public class SignupActivity extends AppCompatActivity {
 
         usernameTextInput.addTextChangedListener(afterTextChangedListener);
         passwordTextInput.addTextChangedListener(afterTextChangedListener);
-        passwordTextInput.addTextChangedListener(afterTextChangedListener);
+        confirmPasswordTextInput.addTextChangedListener(afterTextChangedListener);
 
         listener = createSignupListener();
 
@@ -99,7 +100,13 @@ public class SignupActivity extends AppCompatActivity {
 
             @Override
             public void failed(HashMap<String, String> extraInfo) {
-                Toast.makeText(SignupActivity.this, "Username already exists", Toast.LENGTH_LONG).show();
+                SignupActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(SignupActivity.this, "Username already exists", Toast.LENGTH_LONG).show();
+                    }
+                });
+                Log.v("error", "username exists");
             }
         };
     }
